@@ -1,5 +1,7 @@
 package com.example.springsecuritydemo.config;
 
+import com.example.springsecuritydemo.users.service.UsersService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,8 @@ import javax.sql.DataSource;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    private UsersService usersService;
 //    @Bean
 //    public DataSource dataSource(){
 //        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
@@ -48,18 +52,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("mohammad")
-                .password("123")
-                .roles("USER");
+        auth.userDetailsService(usersService);
     }
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder(){
-//        return new BCryptPasswordEncoder();
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }

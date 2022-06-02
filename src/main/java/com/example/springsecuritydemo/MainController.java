@@ -1,9 +1,13 @@
 package com.example.springsecuritydemo;
 
+import com.example.springsecuritydemo.users.domain.Users;
 import com.example.springsecuritydemo.users.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
@@ -13,6 +17,11 @@ public class MainController {
     @Autowired
     public MainController(UsersService usersService) {
         this.usersService = usersService;
+    }
+
+    @PostMapping(value = "")
+    public @ResponseBody Users registerUser(@RequestBody Users users){
+        return usersService.save(users);
     }
 
     @GetMapping("")

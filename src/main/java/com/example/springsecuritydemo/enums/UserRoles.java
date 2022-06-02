@@ -1,7 +1,14 @@
 package com.example.springsecuritydemo.enums;
 
-public enum UserRoles {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum UserRoles implements GrantedAuthority {
 
     ADMIN,
-    USER
+    USER;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }
