@@ -26,6 +26,11 @@ public class Users implements UserDetails {
             joinColumns = @JoinColumn(name = "email",referencedColumnName = "email"))
     @Enumerated(EnumType.STRING)
     private List<UserRoles> authorities;
+
+    public void setAuthorities(List<UserRoles> authorities) {
+        this.authorities = authorities;
+    }
+
     public Users() {
     }
 
