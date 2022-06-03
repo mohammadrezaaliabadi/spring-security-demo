@@ -3,6 +3,7 @@ package com.example.springsecuritydemo;
 import com.example.springsecuritydemo.users.domain.Users;
 import com.example.springsecuritydemo.users.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,13 +31,14 @@ public class MainController {
         return "index";
     }
 
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     @GetMapping("/user")
     public String userPage() {
         return "user";
     }
 
     @GetMapping("/admin")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_ADMIN')")
     public String adminPage(Model model) {
         model.addAttribute("users", usersService.findAll());
         return "admin";
@@ -49,6 +51,7 @@ public class MainController {
 
 
     @GetMapping("/user/get/{id}")
+    @PostAuthorize("returnObject.email == authentication.name")
     public @ResponseBody
     Users getUser(@PathVariable("id") Long id) {
         return usersService.findById(id);

@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,16 +21,16 @@ public class Users implements UserDetails {
 
     private Boolean enabled = true;
 
-    @ElementCollection(targetClass = UserRoles.class,fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "authorities",
-            joinColumns = @JoinColumn(name = "email",referencedColumnName = "email"))
-    @Enumerated(EnumType.STRING)
-    private List<UserRoles> authorities;
+//    @ElementCollection(targetClass = UserRoles.class,fetch = FetchType.EAGER)
+//    @CollectionTable(
+//            name = "authorities",
+//            joinColumns = @JoinColumn(name = "email",referencedColumnName = "email"))
+//    @Enumerated(EnumType.STRING)
+//    private List<UserRoles> authorities;
 
-    public void setAuthorities(List<UserRoles> authorities) {
-        this.authorities = authorities;
-    }
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Roles> roles;
+
 
     public Users() {
     }
@@ -52,6 +53,10 @@ public class Users implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        var authorities = new ArrayList<GrantedAuthority>();
+        for (Roles role:roles){
+            authorities.addAll(role.getAuthorities());
+        }
         return authorities;
     }
 
@@ -94,5 +99,13 @@ public class Users implements UserDetails {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public List<Roles> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Roles> roles) {
+        this.roles = roles;
     }
 }
