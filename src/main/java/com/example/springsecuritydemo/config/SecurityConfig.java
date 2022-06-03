@@ -51,6 +51,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin().loginPage("/login").usernameParameter("email")
                 .successHandler(new LoginSuccessHandler())
+                .and().rememberMe().rememberMeCookieName("remember")
+                .tokenValiditySeconds(60)
+                .rememberMeParameter("remember")
                 .and().exceptionHandling().accessDeniedPage("/error")
                 .and().logout().logoutUrl("/logout");
 
