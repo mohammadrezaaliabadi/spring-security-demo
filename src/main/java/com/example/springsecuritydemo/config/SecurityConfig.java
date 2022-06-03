@@ -46,10 +46,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/login","/rest").permitAll()
+                .antMatchers("/", "/login","/rest","error").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").usernameParameter("email");
+                .formLogin().loginPage("/login").usernameParameter("email")
+                .successHandler(new LoginSuccessHandler())
+                .and().exceptionHandling().accessDeniedPage("/error")
+                .and().logout().logoutUrl("/logout");
+
     }
 
     @Override
