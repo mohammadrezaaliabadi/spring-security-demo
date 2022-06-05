@@ -13,6 +13,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -111,5 +112,10 @@ public class MainController {
         cookie.setMaxAge(60);
         response.addCookie(cookie);
         return "login";
+    }
+
+    @GetMapping("/info")
+    public @ResponseBody Principal info(Principal principal){
+        return principal;
     }
 }

@@ -23,6 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private OAuth2UserService oAuth2UserService;
 //    @Bean
 //    public DataSource dataSource(){
 //        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
@@ -46,16 +48,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/login","/rest","error").permitAll()
+                .antMatchers("/", "/login", "/error", "/info").permitAll()
+//                .antMatchers("/user/**").hasAnyAuthority("USER","ADMIN")
+//                .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").usernameParameter("email")
+                .formLogin().loginPage("/login").usernameParameter("email").successHandler(new LoginSuccessHandler())
+                .and().oauth2Login()
+                .loginPage("/oauth2Login")
+                .authorizationEndpoint().baseUri("/login/oauth2").and()
+                .redirectionEndpoint().baseUri("/login/callback").and()
+                .userInfoEndpoint().userService(oAuth2UserService).and()
                 .successHandler(new LoginSuccessHandler())
                 .and().rememberMe().rememberMeCookieName("remember")
                 .tokenValiditySeconds(60)
                 .rememberMeParameter("remember")
                 .and().exceptionHandling().accessDeniedPage("/error")
-                .and().logout().logoutUrl("/logout");
+                .and().logout().logoutUrl("/mylogout").deleteCookies("remember");
 
     }
 
