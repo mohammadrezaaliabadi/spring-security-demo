@@ -1,10 +1,16 @@
 package com.example.springsecuritydemo;
 
 import com.example.springsecuritydemo.users.domain.Users;
+import com.example.springsecuritydemo.users.jwt.JwtAuth;
+import com.example.springsecuritydemo.users.jwt.JwtUtils;
 import com.example.springsecuritydemo.users.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +26,16 @@ import java.util.List;
 public class MainController {
 
     private final UsersService usersService;
+    private AuthenticationManager manager;
+    private JwtUtils jwtUtils;
 
-    @Autowired
-    public MainController(UsersService usersService) {
+    public MainController(UsersService usersService, AuthenticationManager manager, JwtUtils jwtUtils) {
         this.usersService = usersService;
+        this.manager = manager;
+        this.jwtUtils = jwtUtils;
     }
+
+
 
     @PostMapping(value = "")
     public @ResponseBody Users registerUser(@RequestBody Users users){
@@ -117,5 +128,27 @@ public class MainController {
     @GetMapping("/info")
     public @ResponseBody Principal info(Principal principal){
         return principal;
+    }
+
+    @PostMapping("/jwt/login")
+    public @ResponseBody
+    ResponseEntity<?> jwtLogin(@RequestBody JwtAuth jwtAuth, HttpServletResponse response) {
+        try {
+            manager.authenticate(new UsernamePasswordAuthenticationToken(jwtAuth.getUsername(), jwtAuth.getPassword()));
+        } catch (Exception e) {
+            response.addHeader("error", e.getMessage());
+
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        }
+
+        response.addHeader("Authorization", jwtUtils.generateToken(jwtAuth.getUsername()));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/jwt/hello")
+    public @ResponseBody
+    String jwtHello() {
+        return "Hello Jwt";
     }
 }
